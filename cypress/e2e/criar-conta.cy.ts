@@ -8,7 +8,7 @@ describe("Criação de conta no sistema", () => {
     it("Teste para criação de conta com dados válidos", () => {
       //visita a base URL definida no cypress.config.js, que é "https://novo-sig.homolog.ledes.net/". Isso garante que o teste comece na página inicial do sistema.
       cy.visit("/");
-      cy.get(".css-j9tmj0").click(); //clica no botão "Criar conta" para iniciar o processo de criação de conta.
+      cy.get('[data-cy="register-button"]').click(); //clica no botão "Criar conta" para iniciar o processo de criação de conta.
       cy.fixture("criar-conta").then((dados) => {
         //A fixture é utilizada para carregar os dados de teste a partir do arquivo "criar-conta.json". O método "then" é usado para acessar os dados carregados e utilizá-los no teste.
         cy.get('[data-cy="nome"]').type(dados.nome);
@@ -16,12 +16,15 @@ describe("Criação de conta no sistema", () => {
         cy.get('[data-cy="open-sexo"]').click();
         cy.get('[data-cy="' + toCyString(dados.sexo) + '"]').click();
         cy.get('[data-cy="documento"]').type(dados.cpf);
-        cy.get(".css-kh7nmy").click(); //botão "Próximo"
+        cy.get('[data-cy="register-next-button"]').click(); //botão "Próximo"
         cy.get('[data-cy="email"]').type(dados.email);
         cy.get('[data-cy="senha"]').type(dados.senha);
         cy.get('[data-cy="senhaConfirmar"]').type(dados.senhaConfirmar);
-        cy.get(".css-kh7nmy").click(); //botão "Próximo"
-        cy.get(".css-d2d35v").click(); //checkbox "Aceite dos termos de uso"
+        cy.wait(100);
+        cy.get('[data-cy="register-next-button"]').click(); //botão "Próximo"
+        cy.wait(100);
+        cy.get('[data-cy="undefined-box"]').click(); //checkbox "Aceite dos termos de uso"
+        cy.wait(1000);
         cy.get('[data-cy="finalizar"]').click();
         //Conta criada, caso o usuário já exista, o sistema exibe uma mensagem de erro, o usuário não é criado mas o teste finaliza sem erros.
         //De acordo com o cenário que estamos testando, o teste é considerado como aprovado, pois o sistema se comportou conforme o esperado, mesmo que a conta não tenha sido criada devido à existência prévia do usuário. O teste verifica se o sistema lida corretamente com a situação de tentativa de criação de conta com um email já existente, garantindo que a mensagem de erro seja exibida e que o processo de criação de conta seja interrompido.
