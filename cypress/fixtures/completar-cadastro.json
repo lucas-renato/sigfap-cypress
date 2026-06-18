@@ -1,0 +1,16 @@
+{
+  "email": "joao.neves@sig.com",
+  "senha": "@Dev12345",
+  "endereco": {
+    "cep": "79002-020",
+    "numero": "100",
+    "complemento": "Apto 1"
+  },
+  "dadosAcademicos": {
+    "instituicaoId": "ufms-universidade-federal-do-mat",
+    "unidadeId": "facom-faculdade-de-computacao",
+    "nivelAcademicoId": "doutorado",
+    "grandeAreaId": "ciencias-exatas-e-da-terra",
+    "curriculoLattes": "http://lattes.cnpq.br/0000000000000000"
+  }
+}
