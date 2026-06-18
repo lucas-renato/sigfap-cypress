@@ -7,10 +7,10 @@
     "complemento": "Apto 1"
   },
   "dadosAcademicos": {
-    "instituicao": "ufms-universidade-federal-do-mat",
-    "unidade": "facom-faculdade-de-computacao",
-    "nivelAcademico": "doutorado",
-    "grandeArea": "ciencias-exatas-e-da-terra",
+    "instituicaoId": "ufms-universidade-federal-do-mat",
+    "unidadeId": "facom-faculdade-de-computacao",
+    "nivelAcademicoId": "doutorado",
+    "grandeAreaId": "ciencias-exatas-e-da-terra",
     "curriculoLattes": "http://lattes.cnpq.br/0000000000000000"
   }
 }

@@ -17,14 +17,17 @@ describe("Completar Cadastro do Usuário", () => {
     context("F-01 — Endereço", () => {
         it("CT-SIG-END-001 — Preencher endereço com CEP válido (caminho feliz)", () => {
             cy.fixture("completar-cadastro").then((dados) => {
+
                 // Passo 1: Navegar até o step Endereço
                 cy.get('[data-cy="user-menu"]').click();
                 cy.contains("Perfil").click();
                 cy.get('[data-cy="endereco"]').click();
 
                 // Passo 2-4: Digitar CEP e aguardar preenchimento automático
-                cy.get('[data-cy="endereco.cep"]').clear().type(dados.endereco.cep);
-                cy.wait(2000);
+                cy.get('[data-cy="endereco.cep"]').clear().type(dados.endereco.cep).blur();
+
+                cy.get('[data-cy="endereco.logradouro"]', { timeout: 10000 })
+                    .should("not.have.value", "");
 
                 // Passo 5-6: Preencher Número e Complemento
                 cy.get('[data-cy="endereco.numero"]').clear().type(dados.endereco.numero);
@@ -50,20 +53,20 @@ describe("Completar Cadastro do Usuário", () => {
 
                 // Passo 2: Selecionar Instituição
                 cy.get('[data-cy="open-instituicao-id"]').click();
-                cy.get('[data-cy="ufms-universidade-federal-do-mat"]').click();
+                cy.get(`[data-cy="${dados.dadosAcademicos.instituicaoId}"]`).click();
 
                 // Passo 3: Selecionar Unidade
                 cy.get('[data-cy="open-unidade-id"]').click();
-                cy.get('[data-cy="facom-faculdade-de-computacao"]').click();
+                cy.get(`[data-cy="${dados.dadosAcademicos.unidadeId}"]`).click();
 
                 // Passo 4: Selecionar Nível Acadêmico
                 cy.get('[data-cy="open-nivel-academico-id"]').click();
-                cy.get('[data-cy="doutorado"]').click();
+                cy.get(`[data-cy="${dados.dadosAcademicos.nivelAcademicoId}"]`).click();
 
                 // Passo 5-6: Adicionar Área de Conhecimento e selecionar Grande Área
                 cy.get('[data-cy="add-areas-de-conhecimento"]').click();
                 cy.get('[data-cy="open-grande-area-id"]').click();
-                cy.get('[data-cy="ciencias-exatas-e-da-terra"]').click();
+                cy.get(`[data-cy="${dados.dadosAcademicos.grandeAreaId}"]`).click();
                 cy.get('[data-cy="areaDeConhecimento-confirmar"]').click();
 
                 // Passo 7: Preencher Currículo Lattes
@@ -87,11 +90,7 @@ describe("Completar Cadastro do Usuário", () => {
 
             // Passo 2-3: Garantir que checkbox está desmarcado
             // Se já estiver marcado do cadastro anterior, desmarca antes de testar
-            cy.get('[data-cy="possui-vinculo-institucional"]').then(($checkbox) => {
-                if ($checkbox.is(":checked")) {
-                    cy.wrap($checkbox).click({ force: true });
-                }
-            });
+            cy.get('[data-cy="possui-vinculo-institucional"]').uncheck({ force: true });
             cy.get('[data-cy="possui-vinculo-institucional"]').should("not.be.checked");
 
             // Passo 4: Clicar em Próximo e verificar redirecionamento
@@ -120,7 +119,6 @@ describe("Completar Cadastro do Usuário", () => {
                 "cypress/fixtures/documento_teste.pdf",
                 { force: true }
             );
-            cy.wait(1000);
 
             // Passo 5: Finalizar cadastro e verificar sucesso
             cy.get('[data-cy="menu-finalizar"]').click();
