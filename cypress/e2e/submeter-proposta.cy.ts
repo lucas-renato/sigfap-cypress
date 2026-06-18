@@ -77,7 +77,7 @@ describe("Submeter Proposta", () => {
 
   // F-08 — APRESENTAÇÃO
   context("F-08 — Apresentação", () => {
-    it.only("CT-SIG-APR-001 — Adicionar membro com status Pendente", () => {
+    it("CT-SIG-APR-001 — Adicionar membro com status Pendente", () => {
       cy.fixture("submeter-proposta").then((dados) => {
         // 1 e 2. Achar a proposta "Projeto Midnight Sun" na tela e clicar em "Em Edição"
         cy.contains(dados.proposta.titulo)
@@ -85,22 +85,22 @@ describe("Submeter Proposta", () => {
           .contains("Em Edição")
           .click();
 
-        // 3. Ir para a aba de apresentação (⚠️ USE A MIRA AQUI)
+        // 3. Ir para a aba de apresentação
         cy.contains("Apresentação").click();
         cy.get('[data-cy="membros"]').click();
 
-        // 4. Clicar e digitar no campo de busca (⚠️ USE A MIRA NO CAMPO "Digite o nome...")
+        // 4. Clicar em "membros"
         cy.get(".css-1osde9l").click();
 
-        // 5. Clicar no resultado que o sistema encontrou (⚠️ USE A MIRA NO NOME QUE APARECER NA LISTA)
+        // 5. Clicar no resultado que o sistema encontrou
         cy.get("#autocomplete-1-listbox-option-1").click();
 
-        // 6. Clicar no botão "+ Adicionar" (⚠️ USE A MIRA NO BOTÃO QUE ESTÁ CINZA)
+        // 6. Clicar no botão " Adicionar"
         cy.get(".css-3xh3ky").click();
 
         cy.contains("Sim, continuar").click();
 
-        // 7. VALIDAÇÃO: Garantir que o nome está na tabela e o status é Pendente
+        // 7. VALIDAÇÃO
         cy.contains(dados.membro.nome).should("exist");
         cy.contains("Pendente", { matchCase: false }).should("exist");
 
