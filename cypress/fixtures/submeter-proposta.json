@@ -1,8 +1,13 @@
 {
-  "email": "joao.neves@sig.com",
-  "senha": "@Dev12345",
+  "email": "lucas@sig.com",
+  "senha": "UD01if*(",
   "proposta": {
-    "titulo": "Projeto de Teste VVT 2026",
+    "titulo": "Projeto Midnight Sun",
     "duracao": "12"
+  },
+  "membro": {
+    "nome": "Maria Sophia Teixeira",
+    "cpf": "26129349017",
+    "funcao": "Pesquisador"
   }
 }
