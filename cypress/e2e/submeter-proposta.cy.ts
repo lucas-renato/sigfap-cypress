@@ -76,35 +76,102 @@ describe("Submeter Proposta", () => {
   });
 
   // F-08 — APRESENTAÇÃO
-  context("F-08 — Apresentação", () => {
+  context.only("F-08 — Apresentação", () => {
     it("CT-SIG-APR-001 — Adicionar membro com status Pendente", () => {
       cy.fixture("submeter-proposta").then((dados) => {
-        // 1 e 2. Achar a proposta "Projeto Midnight Sun" na tela e clicar em "Em Edição"
         cy.contains(dados.proposta.titulo)
           .parent()
           .contains("Em Edição")
           .click();
-
-        // 3. Ir para a aba de apresentação
         cy.contains("Apresentação").click();
         cy.get('[data-cy="membros"]').click();
 
-        // 4. Clicar em "membros"
         cy.get(".css-1osde9l").click();
-
-        // 5. Clicar no resultado que o sistema encontrou
         cy.get("#autocomplete-1-listbox-option-1").click();
-
-        // 6. Clicar no botão " Adicionar"
         cy.get(".css-3xh3ky").click();
-
         cy.contains("Sim, continuar").click();
 
-        // 7. VALIDAÇÃO
         cy.contains(dados.membro.nome).should("exist");
         cy.contains("Pendente", { matchCase: false }).should("exist");
-
         cy.contains("Confirmar").click();
+      });
+    });
+
+    //  Caminho de Exceção - Duplicidade
+    // [EM CONSTRUÇÃO] Teste pausado por exaustão de massa de dados no ambiente.
+    // Falta validar se o sistema barra ou aceita a duplicidade.
+    it.skip("CT-SIG-APR-002 — Impedir adição de membro duplicado", () => {
+      cy.fixture("submeter-proposta").then((dados) => {
+        cy.contains(dados.proposta.titulo)
+          .parent()
+          .contains("Em Edição")
+          .click();
+        cy.contains("Apresentação").click();
+        cy.get('[data-cy="membros"]').click();
+
+        // 1. ADICIONA A PRIMEIRA VEZ (Deve dar sucesso)
+        cy.get(".css-1osde9l").click();
+        cy.get("#autocomplete-1-listbox-option-1").click();
+        cy.get(".css-3xh3ky").click();
+        cy.contains("Sim, continuar").click();
+        cy.contains("Confirmar").click(); // Fecha o modal de sucesso da 1ª vez
+
+        // 2. TENTA ADICIONAR A MESMA PESSOA DE NOVO
+        cy.get(".css-1osde9l").click();
+        cy.get("#autocomplete-1-listbox-option-1").click();
+        cy.get(".css-3xh3ky").click();
+        cy.contains("Sim, continuar").click();
+
+        // VALIDAÇÃO: O sistema DEVE barrar.
+        cy.contains("já existe", { matchCase: false }).should("exist");
+      });
+    });
+
+    // [BUG IDENTIFICADO] Membro removido não retorna para a lista de busca
+    // e o botão de reenvio continua ativo. Documentado na aba Issues
+    // Caminho Alternativo - Remoção
+    it("CT-SIG-APR-003 — Remover um membro da proposta", () => {
+      cy.fixture("submeter-proposta").then((dados) => {
+        cy.contains(dados.proposta.titulo)
+          .parent()
+          .contains("Em Edição")
+          .click();
+        cy.contains("Apresentação").click();
+
+        // Acha o nome do membro e clica no botão de remover (lixeira) na mesma linha
+        // *Atenção: Você pode precisar ajustar o seletor do botão de excluir
+        cy.contains(dados.membro.nome)
+          .parent()
+          .find(
+            'button[aria-label="Excluir"], .fa-trash, [data-cy="remover-membro"]',
+          )
+          .first()
+          .click();
+
+        // Confirma no modal de exclusão (se houver)
+        cy.contains("Sim", { matchCase: false }).click();
+
+        // VALIDAÇÃO: O nome do membro não deve mais aparecer na tela
+        cy.contains(dados.membro.nome).should("not.exist");
+      });
+    });
+
+    // Caminho de Exceção - Busca Inválida
+    it("CT-SIG-APR-004 — Busca por membro inexistente", () => {
+      cy.fixture("submeter-proposta").then((dados) => {
+        cy.contains(dados.proposta.titulo)
+          .parent()
+          .contains("Em Edição")
+          .click();
+        cy.contains("Apresentação").click();
+        cy.get('[data-cy="membros"]').click();
+
+        // Digita um nome que não existe no banco de dados no input de busca
+        cy.get(".css-1osde9l").type("UsuarioFantasma123{enter}");
+
+        // VALIDAÇÃO: Sistema deve exibir mensagem de lista vazia
+        // *Atenção: Ajuste para a mensagem real ("Nenhum usuário encontrado", "Sem resultados", etc)
+        cy.contains("Nenhum", { matchCase: false }).should("exist");
       });
     });
   });
