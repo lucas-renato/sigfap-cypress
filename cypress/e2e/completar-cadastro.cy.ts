@@ -126,4 +126,59 @@ describe("Completar Cadastro do Usuário", () => {
         });
     });
 
+    // Tratamento de exceções 
+
+    context("F-01 — Endereço (CEP inválido)", () => {
+        it("CT-SIG-END-003 — CEP inválido não preenche campos automaticamente", () => {
+            cy.get('[data-cy="user-menu"]').click();
+            cy.contains("Perfil").click();
+            cy.get('[data-cy="endereco"]').click();
+
+            // Salva o valor atual do logradouro
+            cy.get('[data-cy="endereco.logradouro"]').invoke("val").as("logradouroAntes");
+
+
+            cy.get('[data-cy="endereco.cep"]').clear().type("99999-999").blur();
+
+            // Campo logradouro deve permanecer vazio — CEP não existe
+            cy.get("@logradouroAntes").then((valorAntes) => {
+                cy.get('[data-cy="endereco.logradouro"]').should("have.value", valorAntes);
+            });
+        });
+    });
+
+    context("F-03 — Dados Profissionais (com vínculo)", () => {
+        it("CT-SIG-PROF-002 — Marcar vínculo exibe campos adicionais", () => {
+            cy.get('[data-cy="user-menu"]').click();
+            cy.contains("Perfil").click();
+            cy.get('[data-cy="dados-profissionais"]').click();
+
+            // Marca o checkbox de vínculo institucional
+            cy.get('[data-cy="possui-vinculo-institucional"]').check({ force: true });
+            cy.get('[data-cy="possui-vinculo-institucional"]').should("be.checked");
+
+            // Verifica que campos adicionais aparecem
+            cy.get('[data-cy="open-tipo-vinculo-institucional"]').should("exist");
+            cy.get('[data-cy="possui-vinculo-empregaticio"]').should("exist");
+        });
+    });
+
+    context("F-03 — Dados Profissionais (desmarcar vínculo)", () => {
+        it("CT-SIG-PROF-003 — Desmarcar vínculo oculta campos adicionais", () => {
+            cy.get('[data-cy="user-menu"]').click();
+            cy.contains("Perfil").click();
+            cy.get('[data-cy="dados-profissionais"]').click();
+
+            // Garante que está marcado primeiro
+            cy.get('[data-cy="possui-vinculo-institucional"]').check({ force: true });
+            cy.get('[data-cy="open-tipo-vinculo-institucional"]').should("exist");
+
+            // Desmarca e verifica que campos somem
+            cy.get('[data-cy="possui-vinculo-institucional"]').uncheck({ force: true });
+            cy.get('[data-cy="open-tipo-vinculo-institucional"]').should("not.exist");
+        });
+    });
+
+
 });
+
