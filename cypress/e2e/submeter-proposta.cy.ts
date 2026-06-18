@@ -119,6 +119,20 @@ describe("Submeter Proposta", () => {
                 cy.get('[data-cy="endereco"]').should("exist");
             });
         });
+
+        it("CT-SIG-CRD-004 — Dados profissionais da coordenação sem vínculo permite avançar", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                cy.get('[data-cy="coordenacao"]').click();
+                cy.get('[data-cy="dados-profissionais"]').click();
+
+                cy.get('[data-cy="possui-vinculo-institucional"]').uncheck({ force: true });
+                cy.get('[data-cy="next-button"]').click();
+
+                cy.get('[data-cy="apresentacao"]').should("exist");
+            });
+        });
     });
 
 
@@ -127,6 +141,137 @@ describe("Submeter Proposta", () => {
     context("F-08 — Apresentação", () => {
         it.skip("CT-SIG-APR-001 — Adicionar membro com status Pendente (requer segundo usuário cadastrado)", () => { });
 
+    });
+
+
+    // F-09 - ANEXOS
+
+    context("F-09 — Anexos", () => {
+
+        it("CT-SIG-ANX-002 — Arquivo acima do limite é bloqueado", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                cy.get('[data-cy="anexos"]').click();
+                cy.get('[data-cy="documentos-da-proposta"]').click();
+
+                cy.get('[data-cy="open-select-categories-documento"]').click();
+                cy.get('[data-cy="carta-de-apresentacao"]').click();
+
+                cy.get('[data-cy="documentoPropostaAnexo-upload"]').selectFile(
+                    "cypress/fixtures/documento_grande.pdf",
+                    { force: true }
+                );
+
+                cy.contains("documento_grande.pdf").should("not.exist");
+            });
+        });
+
+        it("CT-SIG-ANX-003 — Formato inválido é rejeitado", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                cy.get('[data-cy="anexos"]').click();
+                cy.get('[data-cy="documentos-da-proposta"]').click();
+
+                cy.get('[data-cy="open-select-categories-documento"]').click();
+                cy.get('[data-cy="carta-de-apresentacao"]').click();
+
+                cy.get('[data-cy="documentoPropostaAnexo-upload"]').selectFile(
+                    "cypress/fixtures/imagem_teste.jpg",
+                    { force: true }
+                );
+
+                cy.contains("imagem_teste.jpg").should("not.exist");
+            });
+        });
+
+        it("CT-SIG-ANX-004 — Documento obrigatório ausente bloqueia avanço", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                cy.get('[data-cy="anexos"]').click();
+                cy.get('[data-cy="documentos-da-proposta"]').click();
+
+                // Não faz upload de nada
+                cy.get('[data-cy="next-button"]').click();
+
+                // Sistema deve bloquear
+                cy.get('[data-cy="documentos-da-proposta"]').should("exist");
+            });
+        });
+    });
+
+    // F-10 — TERMO E SUBMISSÃO
+
+    context("F-10 — Termo e Submissão", () => {
+        it.skip("CT-SIG-SUB-001 — Submeter proposta completa (a implementar)", () => {
+
+        });
+
+        it("CT-SIG-SUB-002 — Botão Submeter desabilitado sem Termo de Aceite", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                cy.get('[data-cy="finalizacao"]').click();
+                cy.get('[data-cy="termo-de-aceite"]').click();
+
+                // Confirma checkbox desmarcado
+                cy.get('[data-cy="termo-de-aceite-aceito"]').uncheck({ force: true });
+
+                // Botão de submeter deve estar desabilitado
+                cy.get('[data-cy="next-button"]').should("be.disabled");
+            });
+        });
+    });
+
+    // F-11 - NAVEGAÇÃO
+
+    context("F-11 — Navegação", () => {
+        it("CT-SIG-NAV-001 — Botão Anterior desabilitado no primeiro substep", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                cy.get('[data-cy="coordenacao"]').click();
+                cy.get('[data-cy="dados-pessoais"]').click();
+
+                cy.get('[data-cy="prev-button"]').should("be.disabled");
+            });
+        });
+
+        it("CT-SIG-NAV-002 — Botão Voltar fecha assistente e retorna ao edital", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                cy.get('[data-cy="breadcrumb-voltar"]').click();
+
+                cy.contains("2026-0001 Sig Cypress").should("exist");
+            });
+        });
+
+        it("CT-SIG-NAV-003 — Navegação pelo menu lateral preserva dados", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
+
+                // Navega para Coordenação e volta para Caracterização pelo menu
+                cy.get('[data-cy="coordenacao"]').click();
+                cy.get('[data-cy="caracterizacao"]').click();
+
+                // Dados de título devem estar preservados
+                cy.get('[data-cy="titulo"]').should("have.value", dados.proposta.titulo);
+            });
+        });
+
+        it("CT-SIG-PER-002 — Rascunho de proposta acessível após abandono", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                // Vai pra home e volta pra proposta via minhas propostas
+                cy.get('[data-cy="breadcrumb-home"]').click();
+                navegarParaProposta(dados);
+
+                // Dados devem estar preservados
+                cy.get('[data-cy="titulo"]').should("have.value", dados.proposta.titulo);
+            });
+        });
     });
 
     // F-12 — VERIFICAÇÃO DE PENDÊNCIAS
@@ -143,15 +288,19 @@ describe("Submeter Proposta", () => {
                 cy.contains("pendências").should("exist");
             });
         });
-    });
 
+        it("CT-SIG-PND-001 — Nova proposta com pulo de etapas exibe pendências", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                navegarParaProposta(dados);
 
-    // F-10 — TERMO E SUBMISSÃO
+                // Pula direto para finalização pelo menu lateral
+                cy.get('[data-cy="finalizacao"]').click();
+                cy.get('[data-cy="menu-verificar-pendencias"]').click();
 
-    context("F-10 — Termo e Submissão", () => {
-        it.skip("CT-SIG-SUB-001 — Submeter proposta completa (a implementar)", () => {
-
+                cy.contains("pendências").should("exist");
+            });
         });
     });
+
 
 });
