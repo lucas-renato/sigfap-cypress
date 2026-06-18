@@ -1,0 +1,13 @@
+{
+  "email": "lucas@sig.com",
+  "senha": "UD01if*(",
+  "proposta": {
+    "titulo": "Projeto Midnight Sun",
+    "duracao": "12"
+  },
+  "membro": {
+    "nome": "Maria Sophia Teixeira",
+    "cpf": "26129349017",
+    "funcao": "Pesquisador"
+  }
+}
