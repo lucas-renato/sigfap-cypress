@@ -139,10 +139,102 @@ describe("Submeter Proposta", () => {
     // F-08 — APRESENTAÇÃO
 
     context("F-08 — Apresentação", () => {
-        it.skip("CT-SIG-APR-001 — Adicionar membro com status Pendente (requer segundo usuário cadastrado)", () => { });
+        it("CT-SIG-APR-001 — Adicionar membro com status Pendente", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
 
+                cy.contains(dados.proposta.titulo)
+                    .parent()
+                    .contains("Em Edição")
+                    .click();
+
+
+                cy.contains("Apresentação").click();
+                cy.get('[data-cy="membros"]').click();
+
+
+                cy.get(".css-1osde9l").click();
+
+
+                cy.get("#autocomplete-1-listbox-option-1").click();
+
+
+                cy.get(".css-3xh3ky").click();
+
+                cy.contains("Sim, continuar").click();
+
+
+                cy.contains(dados.membro.nome).should("exist");
+                cy.contains("Pendente", { matchCase: false }).should("exist");
+
+                cy.contains("Confirmar").click();
+            });
+        });
+
+        it.skip("CT-SIG-APR-002 — Impedir adição de membro duplicado", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                cy.contains(dados.proposta.titulo)
+                    .parent()
+                    .contains("Em Edição")
+                    .click();
+                cy.contains("Apresentação").click();
+                cy.get('[data-cy="membros"]').click();
+
+
+                cy.get(".css-1osde9l").click();
+                cy.get("#autocomplete-1-listbox-option-1").click();
+                cy.get(".css-3xh3ky").click();
+                cy.contains("Sim, continuar").click();
+                cy.contains("Confirmar").click();
+
+
+                cy.get(".css-1osde9l").click();
+                cy.get("#autocomplete-1-listbox-option-1").click();
+                cy.get(".css-3xh3ky").click();
+                cy.contains("Sim, continuar").click();
+
+
+                cy.contains("já existe", { matchCase: false }).should("exist");
+            });
+        });
+
+
+        it("CT-SIG-APR-003 — Remover um membro da proposta", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                cy.contains(dados.proposta.titulo)
+                    .parent()
+                    .contains("Em Edição")
+                    .click();
+                cy.contains("Apresentação").click();
+
+                cy.contains(dados.membro.nome)
+                    .parent()
+                    .find(
+                        'button[aria-label="Excluir"], .fa-trash, [data-cy="remover-membro"]',
+                    )
+                    .first()
+                    .click();
+
+                cy.contains("Sim", { matchCase: false }).click();
+
+                cy.contains(dados.membro.nome).should("not.exist");
+            });
+        });
+
+        it("CT-SIG-APR-004 — Busca por membro inexistente", () => {
+            cy.fixture("submeter-proposta").then((dados) => {
+                cy.contains(dados.proposta.titulo)
+                    .parent()
+                    .contains("Em Edição")
+                    .click();
+                cy.contains("Apresentação").click();
+                cy.get('[data-cy="membros"]').click();
+
+                cy.get(".css-1osde9l").type("UsuarioFantasma123{enter}");
+
+                cy.contains("Nenhum", { matchCase: false }).should("exist");
+            });
+        });
     });
-
 
     // F-09 - ANEXOS
 
