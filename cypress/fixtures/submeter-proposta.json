@@ -1,13 +1,12 @@
 {
-  "email": "lucas@sig.com",
-  "senha": "UD01if*(",
+  "email": "joao.neves@sig.com",
+  "senha": "@Dev12345",
   "proposta": {
-    "titulo": "Projeto Midnight Sun",
-    "duracao": "12"
-  },
-  "membro": {
-    "nome": "Maria Sophia Teixeira",
-    "cpf": "26129349017",
-    "funcao": "Pesquisador"
+    "titulo": "Projeto de Teste VVT 2026",
+    "duracao": "12",
+    "protocolo": "000.959.FUNDA.17062026",
+    "instituicaoExecutoraId": "ufms-universidade-federal-do-mat",
+    "unidadeExecutoraId": "facom-faculdade-de-computacao",
+    "grandeAreaId": "ciencias-exatas-e-da-terra"
   }
 }
